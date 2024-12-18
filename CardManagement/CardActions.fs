@@ -58,7 +58,7 @@ module CardActions =
         | Deactivated -> cardDeactivatedMessage card.CardNumber |> processPaymentNotAllowed
         | Active accInfo ->
             if paymentAmount.Value > accInfo.Balance.Value then
-                sprintf "Insufficent funds on card %s" card.CardNumber.Value
+                sprintf "Insufficient funds on card %s" card.CardNumber.Value
                 |> processPaymentNotAllowed
             else
             match accInfo.DailyLimit with

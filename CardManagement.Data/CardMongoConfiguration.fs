@@ -16,7 +16,7 @@ module CardMongoConfiguration =
             if this.User |> isNullOrEmpty then sprintf "mongodb://%s:%i" this.Host this.Port
             else sprintf "mongodb://%s:%s@%s:%i" this.User this.Password this.Host this.Port
 
-    let private createClient (connectionString:string) = MongoClient(connectionString)
+    let private createClient (connectionString:string) = new MongoClient(connectionString)
 
     let getDatabase (config: MongoSettings) =
         let client = createClient config.ConnectionString

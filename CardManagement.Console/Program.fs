@@ -4,13 +4,13 @@ open System
 
     open CardManagement.CardDomainCommandModels
     open CardManagement.Infrastructure
-    open CardManagement
-    open CardManagement.CardWorkflow
-    open CardManagement.CardDomainQueryModels
-    open CardProgramBuilder
+    // open CardManagement
+    // open CardManagement.CardWorkflow
+    // open CardManagement.CardDomainQueryModels
+    // open CardProgramBuilder
 
 [<EntryPoint>]
-let main argv =
+let main _argv =
     AppConfiguration.configureLog()
     let userId = Guid.Parse "b3f0a6f4-ee04-48ab-b838-9b3330c6bca9"
     let cardNumber = "1234123412341234"
@@ -43,10 +43,10 @@ let main argv =
 
     let runWholeThingAsync =
         async {
-            let! user = CardApi.createUser (userId, createUser)
-            let! card = CardApi.createCard createCard
-            let! card = CardApi.topUp (DateTimeOffset.UtcNow, topUpModel)
-            let! card = CardApi.processPayment (DateTimeOffset.UtcNow, paymentModel)
+            let! _user = CardApi.createUser (userId, createUser)
+            let! _card = CardApi.createCard createCard
+            let! _card = CardApi.topUp (DateTimeOffset.UtcNow, topUpModel)
+            let! _card = CardApi.processPayment (DateTimeOffset.UtcNow, paymentModel)
             return ()
         }
     runWholeThingAsync |> Async.RunSynchronously

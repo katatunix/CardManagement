@@ -19,7 +19,7 @@ module CardProgramBuilder =
     in the functions. I kept this code in `obsolete-dependency-managing` branch, see `CardPipeline.fs` file.
     Another option (this one) is to use Interpreter pattern.
     The idea is that we divide our composition code in 2 parts: execution tree and interpreter for that tree.
-    Execution tree is a set of sequentual instructions, like this:
+    Execution tree is a set of sequential instructions, like this:
     - validate input card number, if it's valid
     - get me a card by that number. If there's one
     - activate it.
@@ -33,7 +33,7 @@ module CardProgramBuilder =
     we use union type with a tuple inside every case.
     We use 1 union for 1 bounded context (in our case the whole app is 1 context).
     This union represents all the possible dependencies we use in this bounded context.
-    Every case replresent a placeholder for a dependency.
+    Every case represent a placeholder for a dependency.
     First element of a tuple inside the case is an input parameter of dependency.
     A second tuple is a function, which receives an output parameter of that dependency
     and returns the rest of our execution tree branch.
@@ -57,10 +57,10 @@ module CardProgramBuilder =
         | GetCardWithAccountInfo (x, next) -> GetCardWithAccountInfo (x, (next >> bind f))
         | CreateCard (x, next) -> CreateCard (x, (next >> bind f))
         | ReplaceCard (x, next) -> ReplaceCard (x, (next >> bind f))
-        | GetUser (x, next) -> GetUser (x,(next >> bind f))
-        | CreateUser (x, next) -> CreateUser (x,(next >> bind f))
-        | GetBalanceOperations (x, next) -> GetBalanceOperations (x,(next >> bind f))
-        | SaveBalanceOperation (x, next) -> SaveBalanceOperation (x,(next >> bind f))
+        | GetUser (x, next) -> GetUser (x, (next >> bind f))
+        | CreateUser (x, next) -> CreateUser (x, (next >> bind f))
+        | GetBalanceOperations (x, next) -> GetBalanceOperations (x, (next >> bind f))
+        | SaveBalanceOperation (x, next) -> SaveBalanceOperation (x, (next >> bind f))
         | Stop x -> f x
 
 
@@ -77,26 +77,26 @@ module CardProgramBuilder =
 
     // These are builders for computation expressions. Using CEs will make building execution trees very easy
     type SimpleProgramBuilder() =
-        member __.Bind (x, f) = bind f x
-        member __.Return x = Stop x
-        member __.Zero () = Stop ()
-        member __.ReturnFrom x = x
+        member _.Bind (x, f) = bind f x
+        member _.Return x = Stop x
+        member _.Zero () = Stop ()
+        member _.ReturnFrom x = x
 
     type ProgramBuilder() =
-        member __.Bind (x, f) = bind f x
+        member _.Bind (x, f) = bind f x
         member this.Bind (x, f) =
             match x with
             | Ok x -> this.ReturnFrom (f x)
             | Error e -> this.Return (Error e)
-        member this.Bind((x: Program<Result<_,_>>), f) =
+        member this.Bind(x: Program<Result<_,_>>, f) =
             let f x =
                 match x with
                 | Ok x -> this.ReturnFrom (f x)
                 | Error e -> this.Return (Error e )
             this.Bind(x, f)
-        member __.Return x = Stop x
-        member __.Zero () = Stop ()
-        member __.ReturnFrom x = x
+        member _.Return x = Stop x
+        member _.Zero () = Stop ()
+        member _.ReturnFrom x = x
 
     let program = ProgramBuilder()
     let simpleProgram = SimpleProgramBuilder()

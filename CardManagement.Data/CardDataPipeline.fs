@@ -11,7 +11,7 @@ module CardDataPipeline =
     open CardManagement.CardDomain
     open CardManagement.Data.CardMongoConfiguration
     open FsToolkit.ErrorHandling
-    open CardManagement.Common
+    // open CardManagement.Common
     open System
 
     type CreateCardAsync = Card*AccountInfo -> IoResult<unit>
@@ -21,7 +21,7 @@ module CardDataPipeline =
     type GetUserInfoAsync = UserId -> IoQueryResult<UserInfo>
     type GetUserWithCardsAsync = UserId -> IoQueryResult<User>
     type GetCardAsync = CardNumber -> IoQueryResult<Card>
-    type GetCardWithAccinfoAsync = CardNumber -> IoQueryResult<(Card*AccountInfo)>
+    type GetCardWithAccInfoAsync = CardNumber -> IoQueryResult< Card*AccountInfo >
     type GetBalanceOperationsAsync = CardNumber * DateTimeOffset * DateTimeOffset -> Async<BalanceOperation list>
     type CreateBalanceOperationAsync = BalanceOperation -> IoResult<unit>
 
@@ -33,8 +33,9 @@ module CardDataPipeline =
 
     let createUserAsync (mongoDb: MongoDb) : CreateUserAsync =
         fun user ->
-        user |> DomainToEntityMapping.mapUserToEntity
-        |> CommandRepository.createUserAsync mongoDb
+            user
+            |> DomainToEntityMapping.mapUserToEntity
+            |> CommandRepository.createUserAsync mongoDb
 
     let replaceCardAsync (mongoDb: MongoDb) : ReplaceCardAsync =
         fun card ->
@@ -48,8 +49,9 @@ module CardDataPipeline =
 
     let replaceUserAsync (mongoDb: MongoDb) : ReplaceUserAsync =
         fun user ->
-        user |> DomainToEntityMapping.mapUserToEntity
-        |> CommandRepository.replaceUserAsync mongoDb
+            user
+            |> DomainToEntityMapping.mapUserToEntity
+            |> CommandRepository.replaceUserAsync mongoDb
 
     let getUserInfoAsync (mongoDb: MongoDb) : GetUserInfoAsync =
         fun userId ->
@@ -83,7 +85,7 @@ module CardDataPipeline =
             return card |> Option.map EntityToDomainMapping.mapCardEntity
         }
 
-    let getCardWithAccountInfoAsync (mongoDb: MongoDb) : GetCardWithAccinfoAsync =
+    let getCardWithAccountInfoAsync (mongoDb: MongoDb) : GetCardWithAccInfoAsync =
         fun cardNumber ->
         async {
             let! card = QueryRepository.getCardAsync mongoDb cardNumber.Value
@@ -99,5 +101,6 @@ module CardDataPipeline =
 
     let createBalanceOperationAsync (mongoDb: MongoDb) : CreateBalanceOperationAsync =
         fun balanceOperation ->
-        balanceOperation |> DomainToEntityMapping.mapBalanceOperationToEntity
-        |> CommandRepository.createBalanceOperationAsync mongoDb
+            balanceOperation
+            |> DomainToEntityMapping.mapBalanceOperationToEntity
+            |> CommandRepository.createBalanceOperationAsync mongoDb

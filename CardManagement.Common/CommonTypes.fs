@@ -6,11 +6,11 @@ module CommonTypes =
     open System.Text.RegularExpressions
     open CardManagement.Common.Errors
 
-    let cardNumberRegex = new Regex("^[0-9]{16}$", RegexOptions.Compiled)
+    let cardNumberRegex = Regex("^[0-9]{16}$", RegexOptions.Compiled)
 
-    let lettersRegex = new Regex("^[\w]+[\w ]+[\w]+$", RegexOptions.Compiled)
+    let lettersRegex = Regex("^[\w]+[\w ]+[\w]+$", RegexOptions.Compiled)
 
-    let postalCodeRegex = new Regex("^[0-9]{5,6}$", RegexOptions.Compiled)
+    let postalCodeRegex = Regex("^[0-9]{5,6}$", RegexOptions.Compiled)
 
     type Month =
         | January | February | March | April | May | June | July | August | September | October | November | December
@@ -59,10 +59,10 @@ module CommonTypes =
         member this.Value = match this with LetterString s -> s
         static member create field str =
             match str with
-            | (""|null) -> validationError field "string must contain letters"
+            | ""|null -> validationError field "string must contain letters"
             | str ->
                 if lettersRegex.IsMatch(str) then LetterString str |> Ok
-                else validationError field "string must contain only letters" 
+                else validationError field "string must contain only letters"
 
     [<Struct>]
     type MoneyTransaction = private MoneyTransaction of decimal
@@ -86,7 +86,7 @@ module CommonTypes =
         member this.Value = match this with PostalCode code -> code
         static member create field str =
             match str with
-            | (""|null) -> validationError field "Postal code can't be empty"
+            | ""|null -> validationError field "Postal code can't be empty"
             | str ->
                 if postalCodeRegex.IsMatch(str) |> not
                     then validationError field "postal code must contain 5 or 6 digits and nothing else"

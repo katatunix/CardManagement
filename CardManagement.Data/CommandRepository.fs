@@ -17,7 +17,7 @@ module CommandRepository =
     type CreateBalanceOperationAsync = BalanceOperationEntity -> IoResult<unit>
 
     let updateOptions =
-        let opt = UpdateOptions()
+        let opt = ReplaceOptions()
         opt.IsUpsert <- false
         opt
 
@@ -40,7 +40,7 @@ module CommandRepository =
                 do! func(arg)
                 return Ok ()
             with
-            | DuplicateKey ex ->
+            | DuplicateKey _ex ->
                     return EntityAlreadyExists (arg.GetType().Name, (entityId arg)) |> Error
         }
 
@@ -72,19 +72,19 @@ module CommandRepository =
 
     let replaceUserAsync (mongoDb: MongoDb) : ReplaceUserAsync =
         fun user ->
-            let replaceCommand (selector: Expression<_>, user, options) =
+            let replaceCommand (selector: Expression<_>, user, options: ReplaceOptions) =
                 mongoDb.GetCollection(userCollection).ReplaceOneAsync(selector, user, options)
             user |> executeReplaceAsync replaceCommand
 
     let replaceCardAsync (mongoDb: MongoDb) : ReplaceCardAsync =
         fun card ->
-            let replaceCommand (selector: Expression<_>, card, options) =
+            let replaceCommand (selector: Expression<_>, card, options: ReplaceOptions) =
                 mongoDb.GetCollection(cardCollection).ReplaceOneAsync(selector, card, options)
             card |> executeReplaceAsync replaceCommand
 
     let replaceCardAccountInfoAsync (mongoDb: MongoDb) : ReplaceCardAccountInfoAsync =
         fun accInfo ->
-            let replaceCommand (selector: Expression<_>, accInfo, options) =
+            let replaceCommand (selector: Expression<_>, accInfo, options: ReplaceOptions) =
                 mongoDb.GetCollection(cardAccountInfoCollection).ReplaceOneAsync(selector, accInfo, options)
             accInfo |> executeReplaceAsync replaceCommand
 
@@ -92,4 +92,3 @@ module CommandRepository =
         fun balanceOperation ->
             let insert = mongoDb.GetCollection(balanceOperationCollection).InsertOneAsync >> Async.AwaitTask
             balanceOperation |> executeInsertAsync insert
-

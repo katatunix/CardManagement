@@ -1,11 +1,12 @@
 namespace CardManagement.Api
 
 open System
-open System.Collections.Generic
-open System.IO
-open System.Linq
-open System.Threading.Tasks
-open Microsoft.AspNetCore
+// open System.Collections.Generic
+// open System.IO
+// open System.Linq
+open System.Text.Json.Serialization
+// open System.Threading.Tasks
+// open Microsoft.AspNetCore
 open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Logging
@@ -13,18 +14,18 @@ open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
 open Giraffe
 open CardManagement.Infrastructure
-open CardManagement
-open Common
+// open CardManagement
+open CardManagement.Common
 open Errors
 open ErrorMessages
 open Serilog
 
 module Program =
-    open FSharp.Control.Tasks.V2
-    open CardManagement.CardDomainCommandModels
-    open Giraffe.Serialization
-    open Newtonsoft.Json
-    open Newtonsoft.Json.Serialization
+    // open FSharp.Control.Tasks.V2
+    // open CardManagement.CardDomainCommandModels
+    // open Giraffe.Serialization
+    // open Newtonsoft.Json
+    // open Newtonsoft.Json.Serialization
 
     type [<CLIMutable>] ErrorModel = { Error: string }
     let toErrorModel str = { Error = str }
@@ -32,7 +33,7 @@ module Program =
 
     let errorHandler (ex: Exception) (logger:  Microsoft.Extensions.Logging.ILogger) =
         match ex with
-        | :? Newtonsoft.Json.JsonReaderException ->
+        | :? System.Text.Json.JsonException ->
             clearResponse
             >=> RequestErrors.BAD_REQUEST ex.Message
         | _ ->
@@ -117,15 +118,26 @@ module Program =
         // Add Giraffe dependencies
         services.AddGiraffe() |> ignore
 
-        let customSettings = JsonSerializerSettings()
-        customSettings.Converters.Add(OptionConverter())
-        let contractResolver = CamelCasePropertyNamesContractResolver()
-        customSettings.ContractResolver <- contractResolver
+        let jsonFsOptions =
+            JsonFSharpOptions.Default()
+                .WithSkippableOptionFields()
+                .WithUnionExternalTag()
+                .WithUnionUnwrapSingleFieldCases()
+                .WithUnionUnwrapFieldlessTags()
 
-        services.AddSingleton<IJsonSerializer>(NewtonsoftJsonSerializer(customSettings)) |> ignore
+        services.AddSingleton<Json.ISerializer>(
+            Json.Serializer(jsonFsOptions.ToJsonSerializerOptions())
+        ) |> ignore
+
+        // let customSettings = JsonSerializerSettings()
+        // customSettings.Converters.Add(OptionConverter())
+        // let contractResolver = CamelCasePropertyNamesContractResolver()
+        // customSettings.ContractResolver <- contractResolver
+        //
+        // services.AddSingleton<IJsonSerializer>(NewtonsoftJsonSerializer(customSettings)) |> ignore
 
     [<EntryPoint>]
-    let main args =
+    let main _args =
         AppConfiguration.configureLog()
         WebHostBuilder()
             .UseKestrel()

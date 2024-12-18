@@ -24,7 +24,7 @@ And finally, if function returns just `Error`, it must be a composition of the w
 some validation, then probably business rules checking, then some calls to data base or something and so on.
 *)
 module Errors =
-    open System
+    // open System
 
     type ValidationError =
         { FieldPath: string
@@ -72,7 +72,7 @@ module Errors =
 
     (*
     Some type aliases for making code more readable and for preventing
-    typo-kind of mistakes: so you don't devlare a validation function with
+    typo-kind of mistakes: so you don't declare a validation function with
     plain `Error` type, for example.
     *)
     type AsyncResult<'a, 'error> = Async<Result<'a, 'error>>
